@@ -1,7 +1,4 @@
-# This is a sample Python script.
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 import json
 from operator import itemgetter
@@ -54,40 +51,11 @@ def getTimeSeriesFromList(listOfItems):
         listOfSeries.append((item[0], item[1], item[2], getTimeSeriesById(item[0])))
     return listOfSeries
 
-def filterOutliers(series):
-    amount5MinuteSlicesBack = -24
-    # Assuming 'data' is a Pandas DataFrame with 'buy_price' and 'sell_price' columns
-    data = pd.DataFrame(series[amount5MinuteSlicesBack:])
-    print(data)
-    threshhold = .1
-
-    # Define outlier threshold using the interquartile range (IQR) method
-    q1 = data['avgLowPrice'].quantile(0.25)
-    q3 = data['avgLowPrice'].quantile(0.75)
-    iqr = q3 - q1
-    outlier_threshold = threshhold * iqr
-
-    # Filter outliers for buy price
-    filtered_data_buy = data[
-        (data['avgLowPrice'] >= (q1 - outlier_threshold)) & (data['avgLowPrice'] <= (q3 + outlier_threshold))]
-    print(filtered_data_buy)
-
-    # Filter outliers for sell price
-    q1 = data['avgHighPrice'].quantile(0.25)
-    q3 = data['avgHighPrice'].quantile(0.75)
-    iqr = q3 - q1
-    outlier_threshold = threshhold * iqr
-    filtered_data_sell = data[
-        (data['avgHighPrice'] >= (q1 - outlier_threshold)) & (data['avgHighPrice'] <= (q3 + outlier_threshold))]
-    print(filtered_data_sell)
-    return filtered_data_buy, filtered_data_sell
-
 def zSortFilterOutliers(series):
     amount5MinuteSlicesBack = -16
-    # Assuming 'data' is a Pandas DataFrame with 'buy_price' and 'sell_price' columns
     data = pd.DataFrame(series[amount5MinuteSlicesBack:])
     print(data)
-    # Define outlier threshold using the Z-score method
+    # Define outlier threshold
     z_threshold = 1
 
     # Filter outliers for buy price
@@ -144,7 +112,6 @@ def calculateRestriction(item):
     sell = item[2][0]
     series = item[3]
     volatilityThreshold = 0.002
-    #buyAndSellMultiplier = 0.002
     thresholdMarginPercentage = 0.0008
 
     outlierFilter = zSortFilterOutliers(series)
@@ -172,16 +139,14 @@ def calculateRestriction(item):
         print("Sell deviation high")
         return ("False")
     return ("True", item)
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     list = calculateGoodFlips()
     print(list)
     #margins = calculateMarginCollection(itemList.items)
     #items = getTimeSeriesFromList(margins)
     #series = getTimeSeriesById(13237)
-    #lists = filterOutliers(series)
     #calculateVolatilityAbsMean(lists)
     #calculateMean(lists)
 
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
